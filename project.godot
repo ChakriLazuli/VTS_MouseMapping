@@ -10,12 +10,24 @@ config_version=4
 
 _global_script_classes=[ {
 "base": "Node",
+"class": "ConfigHelper",
+"language": "GDScript",
+"path": "res://Scripts/ConfigHelper.gd"
+}, {
+"base": "Node",
 "class": "SocketHelper",
 "language": "GDScript",
 "path": "res://Scripts/SocketHelper.gd"
+}, {
+"base": "Node",
+"class": "TVTSAPIMessageConstructor",
+"language": "GDScript",
+"path": "res://Scripts/VTSAPIMessageConstructor.gd"
 } ]
 _global_script_class_icons={
-"SocketHelper": ""
+"ConfigHelper": "",
+"SocketHelper": "",
+"TVTSAPIMessageConstructor": ""
 }
 
 [application]

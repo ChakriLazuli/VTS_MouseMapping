@@ -10,7 +10,7 @@ signal response_received_json(json_data)
 var _client = WebSocketClient.new()
 
 func _ready():
-	pass
+	set_process(false)
 
 func _closed(was_clean = false):
 	# was_clean will tell you if the disconnection was correctly notified
