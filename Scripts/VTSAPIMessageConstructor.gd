@@ -20,17 +20,13 @@ const AUTHENTICATION_TOKEN_KEY = "authenticationToken"
 export var icon_png_128: Image
 const PLUGIN_ICON_KEY = "pluginIcon"
 
-#requstID can be unique to map request to response, if needed
-var authentication_token_request: Dictionary = {
-	"apiName": "VTubeStudioPublicAPI",
-	"apiVersion": "1.0",
-	"requestID": "authentication_request",
-	"messageType": "AuthenticationTokenRequest",
-	"data": {
-		"pluginName": "VTS_MouseMapping",
-		"pluginDeveloper": "ChakriLazuli",
-	}
-}
+const NEW_PARAMETER_NAME_KEY = "parameterName"
+const NEW_PARAMETER_EXPLANATION_KEY = "explanation"
+const NEW_PARAMETER_MIN_KEY = "min"
+const NEW_PARAMETER_MAX_KEY = "max"
+const NEW_PARAMETER_DEFAULT_KEY = "defaultValue"
+
+const GET_PARAMETER_VALUE_NAME_KEY = "name"
 
 func _ready():
 	pass 
@@ -41,12 +37,49 @@ func _get_base_request() -> Dictionary:
 func get_authentication_token_request() -> Dictionary:
 	var request = _get_base_request()
 	request[MESSAGE_TYPE_KEY] = "AuthenticationTokenRequest"
-	request[DATA_KEY] = BASE_AUTHENTICATION_DATA.duplicate(true)
+	var data = BASE_AUTHENTICATION_DATA.duplicate(true)
+	request[DATA_KEY] = data
 	return request
 
 func get_authentication_request(token) -> Dictionary:
 	var request = _get_base_request()
 	request[MESSAGE_TYPE_KEY] = "AuthenticationRequest"
-	request[DATA_KEY] = BASE_AUTHENTICATION_DATA.duplicate(true)
-	request[DATA_KEY][AUTHENTICATION_TOKEN_KEY] = token
+	var data = BASE_AUTHENTICATION_DATA.duplicate(true)
+	data[AUTHENTICATION_TOKEN_KEY] = token
+	request[DATA_KEY] = data
+	return request
+
+func get_create_parameter_request(name: String, explanation: String, minimum: int, maximum: int, default: int) -> Dictionary:
+	var request = _get_base_request()
+	request[MESSAGE_TYPE_KEY] = "ParameterCreationRequest"
+	var data: Dictionary
+	data[NEW_PARAMETER_NAME_KEY] = name
+	data[NEW_PARAMETER_EXPLANATION_KEY] = explanation
+	data[NEW_PARAMETER_MIN_KEY] = minimum
+	data[NEW_PARAMETER_MAX_KEY] = maximum
+	data[NEW_PARAMETER_DEFAULT_KEY] = default
+	request[DATA_KEY] = data
+	return request
+
+func get_get_parameter_value_request(name: String) -> Dictionary:
+	var request = _get_base_request()
+	request[MESSAGE_TYPE_KEY] = "ParameterValueRequest"
+	var data: Dictionary
+	data[GET_PARAMETER_VALUE_NAME_KEY] = name
+	request[DATA_KEY] = data
+	return request
+
+
+func get_set_parameter_value_request(name: String, value: float) -> Dictionary:
+	var request = _get_base_request()
+	request[MESSAGE_TYPE_KEY] = "InjectParameterDataRequest"
+	var data: Dictionary
+	data["mode"] = "set"
+	var parameter_value: Dictionary = {
+		"id": name,
+		"value": value
+	}
+	var parameter_values: Array = [parameter_value]
+	data["parameterValues"] = parameter_values
+	request[DATA_KEY] = data
 	return request
