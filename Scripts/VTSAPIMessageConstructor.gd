@@ -17,7 +17,7 @@ const BASE_AUTHENTICATION_DATA: Dictionary = {
 }
 const AUTHENTICATION_TOKEN_KEY = "authenticationToken"
 #Encode to base64 and add to authentication_token_request["data"]
-export var icon_png_128: Image
+@export var icon_png_128: Image
 const PLUGIN_ICON_KEY = "pluginIcon"
 
 const NEW_PARAMETER_NAME_KEY = "parameterName"

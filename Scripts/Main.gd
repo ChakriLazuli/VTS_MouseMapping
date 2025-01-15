@@ -1,23 +1,23 @@
 extends Node
 
 # The URL we will connect to
-onready var socket_helper: SocketHelper = $SocketHelper
-onready var message_constructor: TVTSAPIMessageConstructor = $TVTSAPIMessageConstructor
-onready var config_helper: ConfigHelper = $ConfigHelper
+@onready var socket_helper: SocketHelper = $SocketHelper
+@onready var message_constructor: TVTSAPIMessageConstructor = $TVTSAPIMessageConstructor
+@onready var config_helper: ConfigHelper = $ConfigHelper
 
 #Placeholder UI
-onready var vts_min_x: TextEdit = $CanvasLayer/GridContainer/VTSMinX
-onready var vts_min_y: TextEdit = $CanvasLayer/GridContainer/VTSMinY
-onready var vts_max_x: TextEdit = $CanvasLayer/GridContainer/VTSMaxX
-onready var vts_max_y: TextEdit = $CanvasLayer/GridContainer/VTSMaxY
-onready var custom1_min_x: TextEdit = $CanvasLayer/GridContainer/CustomMinX
-onready var custom1_min_y: TextEdit = $CanvasLayer/GridContainer/CustomMinY
-onready var custom1_max_x: TextEdit = $CanvasLayer/GridContainer/CustomMaxX
-onready var custom1_max_y: TextEdit = $CanvasLayer/GridContainer/CustomMaxY
-onready var custom2_min_x: TextEdit = $CanvasLayer/GridContainer/CustomMinX2
-onready var custom2_min_y: TextEdit = $CanvasLayer/GridContainer/CustomMinY2
-onready var custom2_max_x: TextEdit = $CanvasLayer/GridContainer/CustomMaxX2
-onready var custom2_max_y: TextEdit = $CanvasLayer/GridContainer/CustomMaxY2
+@onready var vts_min_x: TextEdit = $CanvasLayer/GridContainer/VTSMinX
+@onready var vts_min_y: TextEdit = $CanvasLayer/GridContainer/VTSMinY
+@onready var vts_max_x: TextEdit = $CanvasLayer/GridContainer/VTSMaxX
+@onready var vts_max_y: TextEdit = $CanvasLayer/GridContainer/VTSMaxY
+@onready var custom1_min_x: TextEdit = $CanvasLayer/GridContainer/CustomMinX
+@onready var custom1_min_y: TextEdit = $CanvasLayer/GridContainer/CustomMinY
+@onready var custom1_max_x: TextEdit = $CanvasLayer/GridContainer/CustomMaxX
+@onready var custom1_max_y: TextEdit = $CanvasLayer/GridContainer/CustomMaxY
+@onready var custom2_min_x: TextEdit = $CanvasLayer/GridContainer/CustomMinX2
+@onready var custom2_min_y: TextEdit = $CanvasLayer/GridContainer/CustomMinY2
+@onready var custom2_max_x: TextEdit = $CanvasLayer/GridContainer/CustomMaxX2
+@onready var custom2_max_y: TextEdit = $CanvasLayer/GridContainer/CustomMaxY2
 
 const CUSTOM_MOUSE_X_PARAMETER = "MousePositionXRemapped"
 const CUSTOM_MOUSE_Y_PARAMETER = "MousePositionYRemapped"
@@ -30,9 +30,9 @@ const PARAMETER_VALUE_KEY = "value"
 
 func _ready():
 	set_process(false)
-	socket_helper.connect("connected", self, "_connected")
-	socket_helper.connect("disconnected", self, "_closed")
-	socket_helper.connect("response_received_json", self, "_on_response_message")
+	socket_helper.connect("connected", Callable(self, "_connected"))
+	socket_helper.connect("disconnected", Callable(self, "_closed"))
+	socket_helper.connect("response_received_json", Callable(self, "_on_response_message"))
 	socket_helper.connect_to_websocket(config_helper.get_ws_url())
 
 func _closed():
