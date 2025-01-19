@@ -1,0 +1,98 @@
+[gd_scene load_steps=2 format=3 uid="uid://1nk5g41svbu4"]
+
+[ext_resource type="Script" path="res://Scripts/RangeEditWindow.gd" id="1_jrlkx"]
+
+[node name="RangeEditWindow" type="Window"]
+initial_position = 1
+size = Vector2i(500, 300)
+exclusive = true
+script = ExtResource("1_jrlkx")
+
+[node name="VSplitContainer" type="VSplitContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -176.5
+offset_top = -107.5
+offset_right = 176.5
+offset_bottom = 107.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="VSplitContainer"]
+custom_minimum_size = Vector2(400, 40)
+layout_mode = 2
+text = "Resize this window or set mouse range directly.
+The window size reflects the chosen range."
+autowrap_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="VSplitContainer"]
+layout_mode = 2
+columns = 3
+
+[node name="LabelMain" type="Label" parent="VSplitContainer/GridContainer"]
+layout_mode = 2
+text = "Mouse Range"
+
+[node name="LabelMin" type="Label" parent="VSplitContainer/GridContainer"]
+layout_mode = 2
+text = "Range Start"
+
+[node name="LabelMax" type="Label" parent="VSplitContainer/GridContainer"]
+layout_mode = 2
+text = "Range End
+"
+
+[node name="LabelX" type="Label" parent="VSplitContainer/GridContainer"]
+layout_mode = 2
+text = "X"
+
+[node name="MinX" type="SpinBox" parent="VSplitContainer/GridContainer"]
+layout_mode = 2
+max_value = 100000.0
+rounded = true
+
+[node name="MaxX" type="SpinBox" parent="VSplitContainer/GridContainer"]
+layout_mode = 2
+max_value = 100000.0
+value = 1920.0
+rounded = true
+
+[node name="LabelY" type="Label" parent="VSplitContainer/GridContainer"]
+layout_mode = 2
+text = "Y"
+
+[node name="MinY" type="SpinBox" parent="VSplitContainer/GridContainer"]
+layout_mode = 2
+max_value = 100000.0
+rounded = true
+
+[node name="MaxY" type="SpinBox" parent="VSplitContainer/GridContainer"]
+layout_mode = 2
+max_value = 100000.0
+value = 1080.0
+rounded = true
+
+[node name="FullScreen" type="Button" parent="VSplitContainer/GridContainer"]
+layout_mode = 2
+text = "Toggle Full Screen
+"
+
+[node name="SubmitRange" type="Button" parent="VSplitContainer/GridContainer"]
+layout_mode = 2
+text = "Submit Range"
+
+[node name="Cancel" type="Button" parent="VSplitContainer/GridContainer"]
+layout_mode = 2
+text = "Cancel"
+
+[connection signal="close_requested" from="." to="." method="_on_close_requested"]
+[connection signal="value_changed" from="VSplitContainer/GridContainer/MinX" to="." method="_on_min_x_value_changed"]
+[connection signal="value_changed" from="VSplitContainer/GridContainer/MaxX" to="." method="_on_max_x_value_changed"]
+[connection signal="value_changed" from="VSplitContainer/GridContainer/MinY" to="." method="_on_min_y_value_changed"]
+[connection signal="value_changed" from="VSplitContainer/GridContainer/MaxY" to="." method="_on_max_y_value_changed"]
+[connection signal="pressed" from="VSplitContainer/GridContainer/FullScreen" to="." method="_on_full_screen_pressed"]
+[connection signal="pressed" from="VSplitContainer/GridContainer/SubmitRange" to="." method="_on_submit_range_pressed"]
+[connection signal="pressed" from="VSplitContainer/GridContainer/Cancel" to="." method="_on_cancel_pressed"]

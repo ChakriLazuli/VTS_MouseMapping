@@ -1,9 +1,12 @@
-extends Node
+extends Control
 
 # The URL we will connect to
 @onready var socket_helper: SocketHelper = $SocketHelper
 @onready var message_constructor: TVTSAPIMessageConstructor = $TVTSAPIMessageConstructor
 @onready var config_helper: ConfigHelper = $ConfigHelper
+
+@onready var range_window: RangeEditWindow = $RangeEditWindow
+@onready var range_edit_button: Button = $CanvasLayer/GridContainer/EditRangeButton
 
 #Placeholder UI
 @onready var vts_min_x: TextEdit = $CanvasLayer/GridContainer/VTSMinX
@@ -28,15 +31,24 @@ const MOUSE_Y_PARAMETER = "MousePositionY"
 const PARAMETER_NAME_KEY = "name"
 const PARAMETER_VALUE_KEY = "value"
 
+var _range_index = 0
+
+var _do_process_network = false
+
 func _ready():
-	set_process(false)
 	socket_helper.connect("connected", Callable(self, "_connected"))
 	socket_helper.connect("disconnected", Callable(self, "_closed"))
 	socket_helper.connect("response_received_json", Callable(self, "_on_response_message"))
 	socket_helper.connect_to_websocket(config_helper.get_ws_url())
+	
+	get_viewport().gui_embed_subwindows = false
+
+#Runtime loop
+func _process(delta):
+	_request_mouse_values()
 
 func _closed():
-	set_process(false)
+	_do_process_network = false
 
 func _connected():
 	if (config_helper.has_authentication_token()):
@@ -82,7 +94,7 @@ func _on_parameter_created(data: Dictionary):
 		_on_vts_ready()
 
 func _on_vts_ready():
-	set_process(true)
+	_do_process_network = true
 
 #Response mapping
 func _on_response_message(message: Dictionary):
@@ -104,11 +116,9 @@ func _on_response_data(message_type: String, data: Dictionary):
 func _on_api_error(data: Dictionary):
 	print("Error connecting to API: ", data["message"])
 
-#Runtime loop
-func _process(delta):
-	_request_mouse_values()
-
 func _request_mouse_values():
+	if !_do_process_network:
+		return
 	socket_helper.send_to_websocket_dictionary(message_constructor.get_get_parameter_value_request(MOUSE_X_PARAMETER))
 	socket_helper.send_to_websocket_dictionary(message_constructor.get_get_parameter_value_request(MOUSE_Y_PARAMETER))
 
@@ -141,3 +151,13 @@ func _try_update_custom_mouse(name: String, base_value: float, vts_min: float, v
 		return false
 	socket_helper.send_to_websocket_dictionary(message_constructor.get_set_parameter_value_request(name, result))
 	return true
+
+
+func _on_range_edit_window_range_submitted():
+	var range_window_position = range_window.position
+	var range_window_end_position = range_window_position + range_window.size
+	print("Mouse X range: {}, {} | Mouse Y range: {}, {}".format([range_window_position.x, range_window_end_position.x, range_window_position.y, range_window_end_position.y], "{}"))
+
+
+func _on_edit_range_button_pressed():
+	range_window.popup()

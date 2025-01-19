@@ -1,17 +1,14 @@
-[gd_scene load_steps=5 format=3 uid="uid://2f5anfnjeq05"]
+[gd_scene load_steps=6 format=3 uid="uid://2f5anfnjeq05"]
 
 [ext_resource type="Script" path="res://Scripts/Main.gd" id="1"]
 [ext_resource type="Script" path="res://Scripts/SocketHelper.gd" id="2"]
 [ext_resource type="Script" path="res://Scripts/VTSAPIMessageConstructor.gd" id="3"]
 [ext_resource type="Script" path="res://Scripts/ConfigHelper.gd" id="4"]
+[ext_resource type="PackedScene" uid="uid://1nk5g41svbu4" path="res://Scenes/RangeEditWindow.tscn" id="5_l4ts5"]
 
 [node name="Control" type="Control"]
 layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+anchors_preset = 0
 script = ExtResource("1")
 
 [node name="SocketHelper" type="Node" parent="."]
@@ -142,3 +139,13 @@ text = "0"
 layout_mode = 2
 text = "1080
 "
+
+[node name="EditRangeButton" type="Button" parent="CanvasLayer/GridContainer"]
+layout_mode = 2
+text = "Edit Range"
+
+[node name="RangeEditWindow" parent="." instance=ExtResource("5_l4ts5")]
+visible = false
+
+[connection signal="pressed" from="CanvasLayer/GridContainer/EditRangeButton" to="." method="_on_edit_range_button_pressed"]
+[connection signal="range_submitted" from="RangeEditWindow" to="." method="_on_range_edit_window_range_submitted"]
