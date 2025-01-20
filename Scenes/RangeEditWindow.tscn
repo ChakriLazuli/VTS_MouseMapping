@@ -9,17 +9,8 @@ exclusive = true
 script = ExtResource("1_jrlkx")
 
 [node name="VSplitContainer" type="VSplitContainer" parent="."]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -176.5
-offset_top = -107.5
-offset_right = 176.5
-offset_bottom = 107.5
-grow_horizontal = 2
-grow_vertical = 2
+offset_right = 400.0
+offset_bottom = 215.0
 
 [node name="Label" type="Label" parent="VSplitContainer"]
 custom_minimum_size = Vector2(400, 40)

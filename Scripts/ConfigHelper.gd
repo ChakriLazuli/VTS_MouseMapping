@@ -10,6 +10,11 @@ const ws_authentication_config_key = "authentication_token"
 
 const default_ws_url = "ws://localhost:8001"
 
+const data_config_section = "data"
+const data_mouse_ranges_config_key = "mouse_ranges"
+
+const default_mouse_ranges = []
+
 func _ready():
 	_initialize_config()
 
@@ -23,6 +28,9 @@ func _initialize_config():
 	_load_config()
 	if (!config.has_section(ws_config_section)):
 		set_ws_url(default_ws_url)
+		_save_config()
+	if (!config.has_section(data_config_section)):
+		set_mouse_ranges(default_mouse_ranges)
 		_save_config()
 
 func get_ws_url() -> String:
@@ -40,4 +48,11 @@ func get_authentication_token() -> String:
 
 func set_authentication_token(authentication_token: String):
 	config.set_value(ws_config_section, ws_authentication_config_key, authentication_token)
+	_save_config()
+
+func get_mouse_ranges() -> Array:
+	return config.get_value(data_config_section, data_mouse_ranges_config_key, default_mouse_ranges)
+
+func set_mouse_ranges(ranges: Array):
+	config.set_value(data_config_section, data_mouse_ranges_config_key, ranges)
 	_save_config()
