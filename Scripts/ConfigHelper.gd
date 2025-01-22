@@ -50,6 +50,9 @@ func set_authentication_token(authentication_token: String):
 	config.set_value(ws_config_section, ws_authentication_config_key, authentication_token)
 	_save_config()
 
+func has_mouse_ranges() -> bool:
+	return config.has_section_key(data_config_section, data_mouse_ranges_config_key)
+
 func get_mouse_ranges() -> Array:
 	return config.get_value(data_config_section, data_mouse_ranges_config_key, default_mouse_ranges)
 

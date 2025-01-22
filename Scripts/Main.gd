@@ -5,10 +5,13 @@ extends Control
 @onready var message_constructor: TVTSAPIMessageConstructor = $TVTSAPIMessageConstructor
 @onready var config_helper: ConfigHelper = $ConfigHelper
 
+@onready var api_button: Button = $CanvasLayer/VSplitContainer/APIPanel/ConnectAPI
+@onready var api_port: SpinBox = $CanvasLayer/VSplitContainer/APIPanel/SpinBox
+
 @onready var range_window: RangeEditWindow = $RangeEditWindow
 
 @onready var ranges_grid_3: GridContainer = $CanvasLayer/VSplitContainer/RangesPanel/VSplitContainer/RangesGrid
-@onready var mouse_ranges: Array = []
+static var mouse_ranges: Array = []
 
 const VTS_MOUSE_RANGE_INDEX: int = 0
 
@@ -37,6 +40,9 @@ func _ready():
 	socket_helper.connect("disconnected", Callable(self, "_closed"))
 	socket_helper.connect("response_received_json", Callable(self, "_on_response_message"))
 	_connect_to_websocket()
+	
+	if !config_helper.has_mouse_ranges():
+		_save_ranges()
 	mouse_ranges = config_helper.get_mouse_ranges()
 	_refresh_range_list()
 	
@@ -56,6 +62,7 @@ func _on_connect_api_pressed():
 		_connect_to_websocket()
 
 func _closed():
+	api_button.text = "Connect to API"
 	_do_process_network = false
 
 func _connected():
@@ -83,6 +90,7 @@ func _on_authentication_data(data: Dictionary):
 		print("Could not authenticate: ", data["reason"])
 
 func _on_authenticated():
+	api_button.text = "Connected!"
 	_create_custom_mouse_x()
 
 func _create_custom_mouse_x():
@@ -224,14 +232,16 @@ func _remove_range_pressed(index: int):
 	_save_ranges()
 	_refresh_range_list()
 
-func _on_range_list_item_activated(index):
-	mouse_ranges.remove_at(index)
-	_refresh_range_list()
-
 func _refresh_range_list():
 	var children = ranges_grid_3.get_children()
 	for child in children:
 		ranges_grid_3.remove_child(child)
+	
+	if mouse_ranges.size() == 0:
+		var label = Label.new()
+		label.text = "Please add the Mouse Input Config range from VTubeStudio"
+		ranges_grid_3.add_child(label)
+	
 	for i in range(mouse_ranges.size()):
 		var range_string = _range_to_string(i)
 		var label = Label.new()

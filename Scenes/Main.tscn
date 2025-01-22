@@ -33,11 +33,23 @@ offset_bottom = 74.0
 grow_horizontal = 2
 
 [node name="APIPanel" type="PanelContainer" parent="CanvasLayer/VSplitContainer"]
+custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 
 [node name="ConnectAPI" type="Button" parent="CanvasLayer/VSplitContainer/APIPanel"]
+custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
-text = "Retry Connect To API"
+size_flags_horizontal = 0
+text = "Connect to API"
+
+[node name="SpinBox" type="SpinBox" parent="CanvasLayer/VSplitContainer/APIPanel"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+size_flags_horizontal = 8
+tooltip_text = "The VTube Studio API port number"
+max_value = 999999.0
+value = 8001.0
+editable = false
 
 [node name="RangesPanel" type="PanelContainer" parent="CanvasLayer/VSplitContainer"]
 layout_mode = 2

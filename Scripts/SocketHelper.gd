@@ -60,6 +60,7 @@ func _process(delta):
 
 func connect_to_websocket(url: String) -> bool:
 	print("Connecting to websocket: ", url)
+	_client.close()
 	# Initiate connection to the given URL.
 	var err = _client.connect_to_url(url)
 	var result = err == OK
