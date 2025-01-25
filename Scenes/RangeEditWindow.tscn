@@ -42,11 +42,13 @@ text = "X"
 
 [node name="MinX" type="SpinBox" parent="VSplitContainer/GridContainer"]
 layout_mode = 2
+min_value = -100000.0
 max_value = 100000.0
 rounded = true
 
 [node name="MaxX" type="SpinBox" parent="VSplitContainer/GridContainer"]
 layout_mode = 2
+min_value = -100000.0
 max_value = 100000.0
 value = 1920.0
 rounded = true
@@ -57,11 +59,13 @@ text = "Y"
 
 [node name="MinY" type="SpinBox" parent="VSplitContainer/GridContainer"]
 layout_mode = 2
+min_value = -100000.0
 max_value = 100000.0
 rounded = true
 
 [node name="MaxY" type="SpinBox" parent="VSplitContainer/GridContainer"]
 layout_mode = 2
+min_value = -100000.0
 max_value = 100000.0
 value = 1080.0
 rounded = true
