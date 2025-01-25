@@ -4,6 +4,7 @@ extends Window
 signal range_submitted
 
 const MIN_SIZE: int = 300
+const WINDOW_TOOLBAR_OVERHEAD: int = 23
 
 @onready var min_x = $VSplitContainer/GridContainer/MinX
 @onready var min_y = $VSplitContainer/GridContainer/MinY
@@ -20,9 +21,15 @@ func _process(delta):
 
 func _refresh_size_ui():
 	min_x.value = position.x
-	min_y.value = position.y
+	min_y.value = position.y - _get_min_y_modifier()
 	max_x.value = position.x + size.x
 	max_y.value = position.y + size.y
+
+func _get_min_y_modifier() -> int:
+	if is_fullscreen():
+		return 0
+	else:
+		return WINDOW_TOOLBAR_OVERHEAD
 
 func _on_full_screen_pressed():
 	if is_fullscreen():
@@ -60,7 +67,7 @@ func _on_max_x_value_changed(value):
 func _on_min_y_value_changed(value):
 	if is_fullscreen():
 		return
-	var diff = position.y - min_y.value
+	var diff = position.y - min_y.value - _get_min_y_modifier()
 	position.y -= diff
 	size.y += diff
 
