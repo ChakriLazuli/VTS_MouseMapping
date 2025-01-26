@@ -23,51 +23,66 @@ script = ExtResource("4")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
-[node name="VSplitContainer" type="VSplitContainer" parent="CanvasLayer"]
+[node name="GridContainer" type="GridContainer" parent="CanvasLayer"]
+custom_minimum_size = Vector2(700, 0)
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -85.0
-offset_right = 85.0
-offset_bottom = 74.0
+offset_left = -300.0
+offset_right = 300.0
+offset_bottom = 315.0
 grow_horizontal = 2
 
-[node name="APIPanel" type="PanelContainer" parent="CanvasLayer/VSplitContainer"]
-custom_minimum_size = Vector2(300, 0)
+[node name="APIPanel" type="PanelContainer" parent="CanvasLayer/GridContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
 
-[node name="ConnectAPI" type="Button" parent="CanvasLayer/VSplitContainer/APIPanel"]
+[node name="ConnectAPI" type="Button" parent="CanvasLayer/GridContainer/APIPanel"]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 text = "Connect to API"
 
-[node name="SpinBox" type="SpinBox" parent="CanvasLayer/VSplitContainer/APIPanel"]
+[node name="PortLabel" type="Label" parent="CanvasLayer/GridContainer/APIPanel"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "API Port Number:"
+
+[node name="APIPort" type="SpinBox" parent="CanvasLayer/GridContainer/APIPanel"]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 size_flags_horizontal = 8
 tooltip_text = "The VTube Studio API port number"
 max_value = 999999.0
 value = 8001.0
-editable = false
 
-[node name="RangesPanel" type="PanelContainer" parent="CanvasLayer/VSplitContainer"]
+[node name="NetworkStatusLabel" type="Label" parent="CanvasLayer/GridContainer"]
+custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
+text = "Not connected to API..."
+horizontal_alignment = 1
+autowrap_mode = 2
 
-[node name="VSplitContainer" type="VSplitContainer" parent="CanvasLayer/VSplitContainer/RangesPanel"]
+[node name="Instructions" type="Label" parent="CanvasLayer/GridContainer"]
+custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
+text = "The first mouse range specified below must match the Mouse Input Config ranges in VTube Studio (VTS). It will be used to identify what the actual mouse position is described by VTS' MousePositionX and MousePositionY.
+These will be remapped to MousePositionXRemapped and MousePositionYRemapped.
+Every subsequent range will be checked in order, and if the mouse is in this range, the remapped parameters will act as if this is VTS' original range."
+autowrap_mode = 2
 
-[node name="AddRange" type="Button" parent="CanvasLayer/VSplitContainer/RangesPanel/VSplitContainer"]
+[node name="AddRange" type="Button" parent="CanvasLayer/GridContainer"]
 layout_mode = 2
 text = "Add Range"
 
-[node name="RangesGrid" type="GridContainer" parent="CanvasLayer/VSplitContainer/RangesPanel/VSplitContainer"]
+[node name="RangesGrid" type="GridContainer" parent="CanvasLayer/GridContainer"]
 layout_mode = 2
 columns = 3
 
 [node name="RangeEditWindow" parent="." instance=ExtResource("5_l4ts5")]
 visible = false
 
-[connection signal="pressed" from="CanvasLayer/VSplitContainer/APIPanel/ConnectAPI" to="." method="_on_connect_api_pressed"]
-[connection signal="pressed" from="CanvasLayer/VSplitContainer/RangesPanel/VSplitContainer/AddRange" to="." method="_on_add_range_pressed"]
+[connection signal="pressed" from="CanvasLayer/GridContainer/APIPanel/ConnectAPI" to="." method="_on_connect_api_pressed"]
+[connection signal="value_changed" from="CanvasLayer/GridContainer/APIPanel/APIPort" to="." method="_on_api_port_value_changed"]
+[connection signal="pressed" from="CanvasLayer/GridContainer/AddRange" to="." method="_on_add_range_pressed"]
 [connection signal="range_submitted" from="RangeEditWindow" to="." method="_on_range_edit_window_range_submitted"]

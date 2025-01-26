@@ -8,6 +8,7 @@ const ws_config_section = "websocket"
 const ws_url_config_key = "url"
 const ws_authentication_config_key = "authentication_token"
 
+const base_ws_url = "ws://localhost:"
 const default_ws_url = "ws://localhost:8001"
 
 const data_config_section = "data"

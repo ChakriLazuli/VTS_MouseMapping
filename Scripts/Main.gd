@@ -5,12 +5,13 @@ extends Control
 @onready var message_constructor: TVTSAPIMessageConstructor = $TVTSAPIMessageConstructor
 @onready var config_helper: ConfigHelper = $ConfigHelper
 
-@onready var api_button: Button = $CanvasLayer/VSplitContainer/APIPanel/ConnectAPI
-@onready var api_port: SpinBox = $CanvasLayer/VSplitContainer/APIPanel/SpinBox
+@onready var api_button: Button = $CanvasLayer/GridContainer/APIPanel/ConnectAPI
+@onready var api_port: SpinBox = $CanvasLayer/GridContainer/APIPanel/APIPort
+@onready var network_status_label: Label = $CanvasLayer/GridContainer/NetworkStatusLabel
 
 @onready var range_window: RangeEditWindow = $RangeEditWindow
 
-@onready var ranges_grid_3: GridContainer = $CanvasLayer/VSplitContainer/RangesPanel/VSplitContainer/RangesGrid
+@onready var ranges_grid_3: GridContainer = $CanvasLayer/GridContainer/RangesGrid
 static var mouse_ranges: Array = []
 
 const VTS_MOUSE_RANGE_INDEX: int = 0
@@ -35,6 +36,8 @@ var _do_process_network = false
 var _last_x_pixel: float = 0
 var _last_y_pixel: float = 0
 
+var _authentication_token_valid = false
+
 func _ready():
 	socket_helper.connect("connected", Callable(self, "_connected"))
 	socket_helper.connect("disconnected", Callable(self, "_closed"))
@@ -53,17 +56,34 @@ func _process(delta):
 	_request_mouse_values()
 
 func _connect_to_websocket():
+	network_status_label.text = "Connecting websocket..."
 	socket_helper.connect_to_websocket(config_helper.get_ws_url())
 
 func _on_connect_api_pressed():
-	if _do_process_network:
-		_connected()
-	else:
+	if !socket_helper.is_websocket_connected():
 		_connect_to_websocket()
+		return
+	if _authentication_token_valid:
+		pass
+	else:
+		_request_authentication_token()
+
+func _refresh_connect_button():
+	if !socket_helper.is_websocket_connected():
+		api_button.disabled = false
+		api_button.text = "Connect to API"
+		return
+	if _authentication_token_valid:
+		api_button.disabled = true
+		api_button.text = "API Ready..."
+	else:
+		api_button.disabled = false
+		api_button.text = "Retry authentication"
 
 func _closed():
-	api_button.text = "Connect to API"
+	#network_status_label.text = "Not connected to API..."
 	_do_process_network = false
+	_refresh_connect_button()
 
 func _connected():
 	if (config_helper.has_authentication_token()):
@@ -72,6 +92,7 @@ func _connected():
 		_request_authentication_token()
 
 func _request_authentication_token():
+	network_status_label.text = "Requesting authentication token..."
 	socket_helper.send_to_websocket_dictionary(message_constructor.get_authentication_token_request())
 
 func _on_authentication_token_data(data: Dictionary):
@@ -80,17 +101,23 @@ func _on_authentication_token_data(data: Dictionary):
 	_authenticate()
 
 func _authenticate():
+	network_status_label.text = "Authenticating..."
 	var token = config_helper.get_authentication_token()
 	socket_helper.send_to_websocket_dictionary(message_constructor.get_authentication_request(token))
 
 func _on_authentication_data(data: Dictionary):
 	if data["authenticated"]:
+		_authentication_token_valid = true
+		_refresh_connect_button()
 		_on_authenticated()
 	else:
-		print("Could not authenticate: ", data["reason"])
+		network_status_label.text = "Could not authenticate: " + data["reason"]
+		_authentication_token_valid = false
+		_refresh_connect_button()
+		#socket_helper.disconnect_from_websocket()
 
 func _on_authenticated():
-	api_button.text = "Connected!"
+	network_status_label.text = "Connected!"
 	_create_custom_mouse_x()
 
 func _create_custom_mouse_x():
@@ -130,7 +157,9 @@ func _on_response_data(message_type: String, data: Dictionary):
 			_on_parameter_value(data)
 
 func _on_api_error(data: Dictionary):
-	print("Error connecting to API: ", data["message"])
+	var error_message = "Error connecting to API: " + data["message"]
+	network_status_label.text = error_message
+	print(error_message)
 
 func _request_mouse_values():
 	if !_do_process_network:
@@ -265,4 +294,8 @@ func _range_to_string(index: int) -> String:
 	var range = mouse_ranges[index]
 	return "X range: {}, {} | Y range: {}, {}".format([range[MINX_KEY], range[MAXX_KEY], range[MINY_KEY], range[MAXY_KEY]], "{}")
 
-
+func _on_api_port_value_changed(value):
+	var new_url = socket_helper.get_websocket_url(value)
+	config_helper.set_ws_url(new_url)
+	network_status_label.text = "Port changed, please reconnect when you are ready!"
+	socket_helper.disconnect_from_websocket()

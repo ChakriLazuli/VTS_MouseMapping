@@ -6,6 +6,10 @@ signal disconnected()
 signal response_received(data)
 signal response_received_json(json_data)
 
+const base_ws_url = "ws://localhost:"
+const default_ws_port = 8001
+const default_ws_url = "ws://localhost:8001"
+
 # Our WebSocketClient instance
 var _client = WebSocketPeer.new()
 
@@ -67,6 +71,9 @@ func connect_to_websocket(url: String) -> bool:
 	set_process(result)
 	return result
 
+func disconnect_from_websocket():
+	_client.close()
+
 func send_to_websocket(data: String):
 	# You MUST always use get_peer(1).put_packet to send data to server,
 	# and not put_packet directly when not using the MultiplayerAPI.
@@ -78,3 +85,9 @@ func send_to_websocket_json(data):
 func send_to_websocket_dictionary(data: Dictionary):
 	var json = JSON.new().stringify(data)
 	send_to_websocket_json(json)
+
+func is_websocket_connected() -> bool:
+	return connection_open
+
+func get_websocket_url(port: int) -> String:
+	return "{}{}".format([base_ws_url, port], "{}")
