@@ -11,6 +11,8 @@ const WINDOW_TOOLBAR_OVERHEAD: int = 23
 @onready var max_x = $VSplitContainer/GridContainer/MaxX
 @onready var max_y = $VSplitContainer/GridContainer/MaxY
 
+@onready var match_window: CheckBox = $VSplitContainer/GridContainer/MatchWindow
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass
@@ -20,6 +22,8 @@ func _process(delta):
 		_refresh_size_ui()
 
 func _refresh_size_ui():
+	if !match_window.button_pressed:
+		return
 	min_x.value = position.x
 	min_y.value = position.y - _get_min_y_modifier()
 	max_x.value = position.x + size.x
@@ -49,8 +53,11 @@ func _set_fullscreen():
 	#Use Exclusive to prevent 1 pixel size margin
 	#Cannot be popup window, as that breaks the full screen transition
 
+func _should_update_fields() -> bool:
+	return !is_fullscreen() && match_window.button_pressed
+
 func _on_min_x_value_changed(value):
-	if is_fullscreen():
+	if !_should_update_fields():
 		return
 	var diff = position.x - min_x.value
 	position.x -= diff
@@ -58,14 +65,14 @@ func _on_min_x_value_changed(value):
 
 
 func _on_max_x_value_changed(value):
-	if is_fullscreen():
+	if !_should_update_fields():
 		return
 	var diff = position.x + size.x - max_x.value
 	size.x -= diff
 
 
 func _on_min_y_value_changed(value):
-	if is_fullscreen():
+	if !_should_update_fields():
 		return
 	var diff = position.y - min_y.value - _get_min_y_modifier()
 	position.y -= diff
@@ -73,7 +80,7 @@ func _on_min_y_value_changed(value):
 
 
 func _on_max_y_value_changed(value):
-	if is_fullscreen():
+	if !_should_update_fields():
 		return
 	var diff = position.y + size.y - max_y.value
 	size.y -= diff

@@ -9,6 +9,9 @@ extends Control
 @onready var api_port: SpinBox = $CanvasLayer/GridContainer/APIPanel/APIPort
 @onready var network_status_label: Label = $CanvasLayer/GridContainer/NetworkStatusLabel
 
+@onready var current_mouse_label: Label = $CanvasLayer/GridContainer/CurrentMouse
+@onready var output_estimate_label: Label = $CanvasLayer/GridContainer/OutputEstimate
+
 @onready var range_window: RangeEditWindow = $RangeEditWindow
 
 @onready var ranges_grid_3: GridContainer = $CanvasLayer/GridContainer/RangesGrid
@@ -33,8 +36,8 @@ const MAXY_KEY = "maxY"
 var _current_editing_range_index = 0
 
 var _do_process_network = false
-var _last_x_pixel: float = 0
-var _last_y_pixel: float = 0
+var _last_pixel: Vector2 = Vector2(0, 0)
+var _last_output: Vector2 = Vector2(0, 0)
 
 var _authentication_token_valid = false
 
@@ -54,6 +57,7 @@ func _ready():
 #Runtime loop
 func _process(delta):
 	_request_mouse_values()
+	_update_mouse_estimates()
 
 func _connect_to_websocket():
 	network_status_label.text = "Connecting websocket..."
@@ -177,7 +181,7 @@ func _on_parameter_value(data: Dictionary):
 			_update_custom_mouse_y(data[PARAMETER_VALUE_KEY])
 
 func _update_custom_mouse_x(base_value: float):
-	_last_x_pixel = _x_to_screen_pixel(base_value)
+	_last_pixel.x = _x_to_screen_pixel(base_value)
 	_update_custom_mouse()
 
 func _x_to_screen_pixel(base_value: float) -> float:
@@ -193,7 +197,7 @@ func _to_screen_pixel(base_value: float, min: float, max: float) -> float:
 	return screen_pixel
 
 func _update_custom_mouse_y(base_value: float):
-	_last_y_pixel = _y_to_screen_pixel(base_value)
+	_last_pixel.y = _y_to_screen_pixel(base_value)
 	_update_custom_mouse()
 
 func _y_to_screen_pixel(base_value: float) -> float:
@@ -210,23 +214,24 @@ func _try_update_custom_mouse(index: int) -> bool:
 		return false
 	
 	var mouse_range = mouse_ranges[index]
-	_update_custom_mouse_for_axis(CUSTOM_MOUSE_X_PARAMETER, _last_x_pixel, mouse_range[MINX_KEY], mouse_range[MAXX_KEY])
-	_update_custom_mouse_for_axis(CUSTOM_MOUSE_Y_PARAMETER, _last_y_pixel, mouse_range[MINY_KEY], mouse_range[MAXY_KEY])
+	_last_output.x = _update_custom_mouse_for_axis(CUSTOM_MOUSE_X_PARAMETER, _last_pixel.x, mouse_range[MINX_KEY], mouse_range[MAXX_KEY])
+	_last_output.y = _update_custom_mouse_for_axis(CUSTOM_MOUSE_Y_PARAMETER, _last_pixel.y, mouse_range[MINY_KEY], mouse_range[MAXY_KEY])
 	return true
 
 func _is_in_range(index: int) -> bool:
 	var range = mouse_ranges[index]
-	if  _last_x_pixel < range[MINX_KEY] || range[MAXX_KEY] < _last_x_pixel:
+	if  _last_pixel.x < range[MINX_KEY] || range[MAXX_KEY] < _last_pixel.x:
 		return false
-	if  _last_y_pixel < range[MINY_KEY] || range[MAXY_KEY] < _last_y_pixel:
+	if  _last_pixel.y < range[MINY_KEY] || range[MAXY_KEY] < _last_pixel.y:
 		return false
 	return true
 
-func _update_custom_mouse_for_axis(axis: String, pixel: float, min: float, max: float):
+func _update_custom_mouse_for_axis(axis: String, pixel: float, min: float, max: float) -> float:
 	var range_size: float = max - min
 	var pixel_0_1: float = (pixel - min) / range_size
 	var result: float = pixel_0_1 * 2 - 1
 	socket_helper.send_to_websocket_dictionary(message_constructor.get_set_parameter_value_request(axis, result))
+	return result
 
 #UI interactions
 func _on_range_edit_window_range_submitted():
@@ -299,3 +304,11 @@ func _on_api_port_value_changed(value):
 	config_helper.set_ws_url(new_url)
 	network_status_label.text = "Port changed, please reconnect when you are ready!"
 	socket_helper.disconnect_from_websocket()
+
+func _update_mouse_estimates():
+	if !_do_process_network:
+		var real_mouse_pos = DisplayServer.mouse_get_position()
+		_last_pixel = real_mouse_pos
+		_update_custom_mouse()
+	current_mouse_label.text = "Current Mouse Position X: {}, Y: {}".format([_last_pixel.x, _last_pixel.y], "{}")
+	output_estimate_label.text = "Expected VTS Input X: {}, Y: {}".format([_last_output.x, _last_output.y], "{}")

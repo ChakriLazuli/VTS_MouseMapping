@@ -1,7 +1,7 @@
 class_name ConfigHelper
 extends Node
 
-#Should be found under user/Roaming/Godot/VTS_MouseMapping
+#Should be found under user/AppData/Roaming/Godot/VTS_MouseMapping
 @onready var config = ConfigFile.new()
 const config_location = "user://MouseMappingConfig.cfg"
 const ws_config_section = "websocket"

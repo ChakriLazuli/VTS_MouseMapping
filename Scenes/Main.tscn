@@ -71,6 +71,14 @@ These will be remapped to MousePositionXRemapped and MousePositionYRemapped.
 Every subsequent range will be checked in order, and if the mouse is in this range, the remapped parameters will act as if this is VTS' original range."
 autowrap_mode = 2
 
+[node name="CurrentMouse" type="Label" parent="CanvasLayer/GridContainer"]
+layout_mode = 2
+text = "Current Mouse Position:"
+
+[node name="OutputEstimate" type="Label" parent="CanvasLayer/GridContainer"]
+layout_mode = 2
+text = "Expected Output:"
+
 [node name="AddRange" type="Button" parent="CanvasLayer/GridContainer"]
 layout_mode = 2
 text = "Add Range"
